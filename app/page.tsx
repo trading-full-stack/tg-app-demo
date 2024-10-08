@@ -1,101 +1,93 @@
-import Image from "next/image";
+"use client"
+import React, { useEffect } from "react";
+import { createWeb3Modal } from "@web3modal/wagmi/react";
 
-export default function Home() {
+import { http, createConfig, WagmiProvider } from "wagmi";
+import { mainnet, arbitrum } from "viem/chains";
+import { walletConnect, injected } from "wagmi/connectors";
+import type { CreateConnectorFn } from "@wagmi/core";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { authConnector } from "@web3modal/wagmi";
+import { isTelegramEnvironment, overrideWindowOpen } from "@bitget-wallet/omni-connect";
+
+
+// 0. Setup queryClient
+const queryClient = new QueryClient();
+
+// 1. Get projectId at https://cloud.walletconnect.com
+const projectId = "11b3912d762aac0ca52cbef8c8d8897d";
+if (!projectId) throw new Error("Project ID is undefined");
+
+// 2. Create wagmiConfig
+const metadata = {
+  name: "Web3Modal",
+  description: "Web3Modal Example",
+  url: "https://web3modal.com",
+  icons: ["https://avatars.githubusercontent.com/u/37784886"],
+};
+
+// Define chains
+const chains = [mainnet, arbitrum] as const;
+
+// create the connectors
+const connectors: CreateConnectorFn[] = [];
+connectors.push(walletConnect({ projectId, metadata, showQrModal: false }));
+connectors.push(injected({ shimDisconnect: true }));
+
+connectors.push(
+  authConnector({
+    options: { projectId },
+    socials: ["google", "x", "github", "discord", "apple"], // this will create a non-custodial wallet (please check https://secure.walletconnect.com/dashboard for more info)
+    showWallets: true,
+    email: true,
+    walletFeatures: false,
+  })
+);
+
+const wagmiConfig = createConfig({
+  chains, // Use the defined chains here
+  transports: {
+    [mainnet.id]: http(),
+    [arbitrum.id]: http(),
+  },
+  connectors: connectors,
+});
+
+// 3. Create modal
+createWeb3Modal({
+  wagmiConfig,
+  projectId,
+  featuredWalletIds: [
+    "38f5d18bd8522c244bdd70cb4a68e0e718865155811c043f052fb9f1c51de662", // Bitget Wallet project ID
+    "21c3a371f72f0057186082edb2ddd43566f7e908508ac3e85373c6d1966ed614", // Bitget Wallet Lite project ID
+  ],
+
+});
+
+const App = () => {
+  useEffect(() => {
+    const initOverrideWindowOpen = async () => {
+        // 判断是否是Telegram Mini App的环境
+        const isTMA = await isTelegramEnvironment();
+        if (!isTMA) {
+          return;
+        }
+        // 执行@bitget-wallet/omni-connect 初始化方法
+        overrideWindowOpen();
+    };
+    initOverrideWindowOpen();
+  }, []);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      <WagmiProvider config={wagmiConfig}>
+        <QueryClientProvider client={queryClient}>
+          <div className="centered-div">
+            <w3m-button />
+          </div>
+        </QueryClientProvider>
+      </WagmiProvider>
   );
-}
+};
+
+export default App;
