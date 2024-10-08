@@ -9,6 +9,9 @@ import type { CreateConnectorFn } from "@wagmi/core";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { authConnector } from "@web3modal/wagmi";
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore
 import { isTelegramEnvironment, overrideWindowOpen } from "@bitget-wallet/omni-connect";
 
 
