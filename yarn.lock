@@ -19,10 +19,10 @@
   dependencies:
     regenerator-runtime "^0.14.0"
 
-"@bitget-wallet/omni-connect@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@bitget-wallet/omni-connect/-/omni-connect-0.0.3.tgz#7740e4fce4e3d58e2ac7d52dfab09da66403fc22"
-  integrity sha512-Di5B3Ln3RyGBllslXs/IuNN/JYKXMjtxRJOBihe+A8Zadu8BX6J2Kb41aflM2h++QS5ZmkdlKgt+l6UdiFsqiQ==
+"@bitget-wallet/omni-connect@0.0.4-alpha":
+  version "0.0.4-alpha"
+  resolved "https://registry.yarnpkg.com/@bitget-wallet/omni-connect/-/omni-connect-0.0.4-alpha.tgz#f3d68a05789c7e77dd7b1ca9e0ddd77ee6a72f0d"
+  integrity sha512-ao+n5bDvDC0En1WvmUFvmhW6KzzUNlH+lQxdTgojJT3VO8Q8OW3cuWpssBougLU4fZ5qlh4JmCwlbGH7Zc4Fgg==
   dependencies:
     "@telegram-apps/sdk" "^1.1.3"
     tslib "^2.7.0"
